@@ -3,7 +3,7 @@ arch: amd64
 dist: bionic
 language: go
 go:
-  - 1.13
+  - 1.14.x
 
 before_install:
   - go get -v github.com/mitchellh/gox@v1.0.1
@@ -15,7 +15,7 @@ before_script:
   - true
 
 script:
-  - gox -osarch="linux/386 linux/amd64 linux/arm linux/arm64 darwin/amd64 darwin/386 windows/amd64 windows/386"
+  - gox -osarch="linux/amd64 linux/arm linux/arm64 windows/amd64"
     -output="out/{{.Dir}}-{{.OS}}-{{.Arch}}" -ldflags "-s -w -X jdel.org/gosspks/cfg.Version=${TRAVIS_BRANCH}"
 
 after_script:
@@ -28,7 +28,7 @@ deploy:
   provider: releases
   token: $GITHUB_TOKEN
   file_glob: true
-  file: out/gosspks-*
+  file: out/*
   draft: true
   skip_cleanup: true
   on:
