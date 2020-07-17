@@ -5,31 +5,16 @@ language: go
 go:
   - 1.13
 
-addons:
-  apt:
-    packages:
-    - python3
-    - python3-pip
-    - python3-setuptools
-    - python3-wheel
-
-cache:
-  directories:
-  - "$HOME/.cache/pip"
-
 before_install:
-  - curl -sSL https://codeclimate.com/downloads/test-reporter/test-reporter-0.6.3-linux-amd64 -o ${GOPATH}/bin/test-reporter
-  - chmod +x ${GOPATH}/bin/test-reporter
   - go get -v github.com/mitchellh/gox@v1.0.1
 
 install:
   - go get -v ./...
 
 before_script:
-  - test-reporter before-build
+  - true
 
 script:
-  - go test -coverprofile c.out ./... -race
   - gox -osarch="linux/386 linux/amd64 linux/arm linux/arm64 darwin/amd64 darwin/386 windows/amd64 windows/386"
     -output="out/{{.Dir}}-{{.OS}}-{{.Arch}}" -ldflags "-s -w -X jdel.org/gosspks/cfg.Version=${TRAVIS_BRANCH}"
 
