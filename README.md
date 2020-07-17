@@ -1,4 +1,6 @@
-# gosspks: A Go SPK Server for Synology NAS 
+# gosspks: A Go SPK Server for Synology NAS
+
+A
 
 [![Travis](https://img.shields.io/travis/jdel/gosspks.svg)](https://travis-ci.org/jdel/gosspks)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/jdel.org/gosspks)
@@ -100,7 +102,7 @@ docker run -d --name gosspks \
            -p 80:8080 \
            -v $(pwd)/packages/:/home/user/gosspks/packages/:rw \
            -e GOSSPKS_HOSTNAME=yourdomain.com \
-           jdel/gosspks:v0.1 
+           jdel/gosspks:v0.1
 ```
 
 Is strictly equivalent to:
@@ -200,7 +202,7 @@ The same way, using environment variables like `GOSSPKS_FILESYSTEM_CACHE=my_cach
 
 :warning: command line flags take precedence over environment variables.
 
-I will not detail all configuration options but the most important 
+I will not detail all configuration options but the most important
 
 ## More configuration options
 
@@ -210,7 +212,7 @@ It is possible to bypass completely the home directory by specifying the config 
 
 ## Ok, but, I want a web UI !
 
-Right, there is [gosspks-ui](https://jdel.org/gosspks-ui), a React UI, but there is no real documentation yet, 
+Right, there is [gosspks-ui](https://jdel.org/gosspks-ui), a React UI, but there is no real documentation yet,
 
 A Docker image is available, you can run the followinf `docker-compose.yml` file through `docker-compose up -d` or `docker stack deploy -c docker-compose.yml gosspks`:
 
@@ -248,7 +250,7 @@ services:
     logging:
      options:
        max-size: 50m
-       
+
 networks:
   mobynet:
 ```
