@@ -21,17 +21,14 @@ script:
 after_script:
   - true
 
+before_deploy:
+  - true
+
 deploy:
   provider: releases
   token: $GITHUB_TOKEN
-  file:
-    - out/gosspks-darwin-386
-    - out/gosspks-darwin-amd64
-    - out/gosspks-linux-386
-    - out/gosspks-linux-amd64
-    - out/gosspks-linux-arm
-    - out/gosspks-windows-386.exe
-    - out/gosspks-windows-amd64.exe
+  file_glob: true
+  file: out/gosspks-*
   draft: true
   skip_cleanup: true
   on:
