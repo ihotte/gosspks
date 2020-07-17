@@ -15,8 +15,8 @@ before_script:
   - true
 
 script:
-  - gox -osarch="linux/amd64 linux/arm linux/arm64 windows/amd64"
-    -output="out/{{.Dir}}-{{.OS}}-{{.Arch}}" -ldflags "-s -w -linkmode 'external' -extldflags '-static' -X jdel.org/gosspks/cfg.Version=${TRAVIS_BRANCH}"
+  - CGO_ENABLED=0 gox -osarch="linux/amd64 linux/arm linux/arm64 windows/amd64"
+    -output="out/{{.Dir}}-{{.OS}}-{{.Arch}}" -ldflags "-s -w -X jdel.org/gosspks/cfg.Version=${TRAVIS_BRANCH}"
 
 after_script:
   - true
