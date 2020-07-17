@@ -1,6 +1,10 @@
+os: linux
+arch: amd64
+dist: bionic
 language: go
 go:
-- 1.13
+  - 1.13
+
 addons:
   apt:
     packages:
@@ -8,60 +12,42 @@ addons:
     - python3-pip
     - python3-setuptools
     - python3-wheel
+
 cache:
   directories:
   - "$HOME/.cache/pip"
+
 before_install:
-- curl -sSL https://codeclimate.com/downloads/test-reporter/test-reporter-0.6.3-linux-amd64
-  -o ${GOPATH}/bin/test-reporter
-- chmod +x ${GOPATH}/bin/test-reporter
-- go get -v github.com/mitchellh/gox@v1.0.1
+  - curl -sSL https://codeclimate.com/downloads/test-reporter/test-reporter-0.6.3-linux-amd64 -o ${GOPATH}/bin/test-reporter
+  - chmod +x ${GOPATH}/bin/test-reporter
+  - go get -v github.com/mitchellh/gox@v1.0.1
+
 install:
-- go get -v ./...
+  - go get -v ./...
+
 before_script:
-- test-reporter before-build
+  - test-reporter before-build
+
 script:
-- go test -coverprofile c.out ./... -race
-- gox -osarch="linux/386 linux/amd64 linux/arm linux/arm64 darwin/amd64 darwin/386
-  windows/amd64 windows/386" -output="out/{{.Dir}}-{{.OS}}-{{.Arch}}" -ldflags "-s
-  -w -X jdel.org/gosspks/cfg.Version=${TRAVIS_BRANCH}"
+  - go test -coverprofile c.out ./... -race
+  - gox -osarch="linux/386 linux/amd64 linux/arm linux/arm64 darwin/amd64 darwin/386 windows/amd64 windows/386"
+    -output="out/{{.Dir}}-{{.OS}}-{{.Arch}}" -ldflags "-s -w -X jdel.org/gosspks/cfg.Version=${TRAVIS_BRANCH}"
+
 after_script:
-- test-reporter after-build --coverage-input-type gocov --prefix jdel.org/gosspks
-  --exit-code ${TRAVIS_TEST_RESULT}
+  - true
+
 deploy:
-- provider: script
-  skip_cleanup: true
-  script: bash scripts/vangen.sh
-  on:
-    branch: master
-- provider: script
-  skip_cleanup: true
-  script: bash scripts/b2.sh
-  on:
-    tags: false
-    all_branches: true
-- provider: releases
-  overwrite: true
-  api_key:
-    secure: tCnJi3GvBS37LLBojbyPLwdJTh4xgCcs5Nn0ui0oDJUVp+NyiuAQcHAnUnIQ36M1pAeOtwBWyjawSrigqiOJ/tLLB54HMEITSbn+celb4oL04GEl2EoqDtyMjnZwrKtxWzTtGfjaycaiYUJNZRJlpyLz3Xg3DwyFWXRFRMya95jFlS+F8/kE5wzrNdV45wN+0hPKlJzaF9DtbgQBLhL0t0dZ0khBHTY7WIf7eHEYdYeGClFyzPAdLEON6CFcKkXWxn88No39T1upd7oR+k8RhsikngtkrQc2fu06F9EZFVdJVyrVSkKb+iXCzgoiOCsvyIWyH2je3gZq+vqcfBQQ2hTIrXvpq6w2vBDy30HWcTW2O7FkwgfwpH/y7d7kOZ9ZyY4cxYYIEVrq4kxHOn2cEBbKEWmlynjpKqBmHMbdVWNrG2ksIJJjBV3TumRuXNnAPNf+KnRwz8+v9j44vhMfXFlPkNsS7aS7XXV9HQvYxcFXYGFEd8Pe7CSBI7Pe+/FVVbxnmPpMjlaiMBueQjZYSn4waTB3VPtmdj0sfRxj8YmsBSFde6toZLXBq4ooLlRh7zXMRj3b7Wl84hz9cVl2x1prsq/qlcTyIv8vekDfnGOkZZvypJelV4sLbaGTrnQFnXSI97RIxQzvfLT+Od8aorX220mcsKj5Xs/gmO7s8hw=
+  provider: releases
+  token: $GITHUB_TOKEN
   file:
-  - out/gosspks-darwin-386
-  - out/gosspks-darwin-amd64
-  - out/gosspks-linux-386
-  - out/gosspks-linux-amd64
-  - out/gosspks-linux-arm
-  - out/gosspks-windows-386.exe
-  - out/gosspks-windows-amd64.exe
+    - out/gosspks-darwin-386
+    - out/gosspks-darwin-amd64
+    - out/gosspks-linux-386
+    - out/gosspks-linux-amd64
+    - out/gosspks-linux-arm
+    - out/gosspks-windows-386.exe
+    - out/gosspks-windows-amd64.exe
+  draft: true
   skip_cleanup: true
   on:
-    repo: jdel/gosspks
     tags: true
-notifications:
-  slack:
-    secure: roUfLYvdO1i7NDMhxzUXtzTSK4xGbpdnUO86h9Oa84PEFZbo4zrya/zevoA+mmuWOf/Wvl5crvv+0KSFcijNrwqJbzdY0Oc55JwQlel+fnoa6OBFXgSoVa0lmdFwcJN9sCHOMFfpVluCriSn7Hc1W8uFutNRUsmEiZlgN8K+Fis79D2ousXQS0ZtmxGX6Va+pyoWuW0HLHdbEtFJRdPz0BW+N5WkTmKuCvkmZgEtCRl+fYn1Bo/4y2rj+HSCEaYtihpmD1MDgxVFwc2rWfZRE5zCJowTgkHKrGOHZ3A7blyZgrrb2I9SwLqk0khSjys5GqNiqfOD7Ocp0Xjj6UWl5W3qRXbvgXNx4Vje3jR5vJJxl2NXl8iPeXVPc7GBi9MpX024kF4ZSwfecJ6gaRG2mGmukbgVa1x/RI6624szujgO2DNZCZ3Tp1mLKuj4wwik3+8EJ3MEX+MBk0f5SJNyumL6vTNICkaH5iRKajlJ4MLfIs6g5kIZftOP6sTruLtCIytajPhebVSEbfXx9XiKNR1WKNYvoXXR1uXJ3o04f9SQlLBblBIcXokSb2yNZyzzlZSLJztcR+VvHZs9bjCYKGHEJxsu3FBt7RC0dBCWGEYqvfo94rT8ypZ4nJTQfrTyPAyHUvpKDmu2dgZdIp5wtvtL7Lz+sfhtlW0x6Pw5f+4=
-env:
-  global:
-  - secure: wKuKRZLlkTRbVULX9yvB1ipIBv8qtd2udJ5yXf+iI6q4jyb+MKUxLz2nYlG+95ZH10JeCCPFewkDROUIz9hHhPb8m7OdB7Q3/dQd2eSItaRlhaWNGKoVJKHfwV98P8s5Kq/0TJS2QXjuBQrhoTHtJOOC/V/NmzPUTyWecpXliSL3jm15XPi3MlG/ttd10MrqZ0zYbnyv7bG7sLuOIrKat63Wt/6pm9ftILNCfSV07jm5zHy0a/GyolsksnK5HE/+r56LAlXlxaXmev3exqd+oxTlq1r0S8GBBJJZmgXsQvvmCu+prsTeg0xHgE4Rm72SGdTktxbj+d09MACFsQ1KCrPSSIInooLXKvivD6wo35Q/94pPyxnmZvB0NtjI3Oj2ttcIF2us39pQwYQP+Bw+bX5Set36lnOZKWAUzzCi183vCDByJNHw3LX6N0s2d32zZ872HRPNGvddnBz0wU5vcaljajh/1Gtl0akiJLDYPS/lJddDkI2mvPgfW2T8Gt9LTLQsjSYM4e/sIvOn44elJ0H0TbLG7915F+bBKUgkH1xN6I4gKKYqemzW/HGyfdqPW+vBnZrFJm0u5ny83rbAsi5Zofk9dv7SgTZGnKMa29jKvjv9RaRnc8GbglqxeIZtFM/gEX5Jkg6g38SBB0ke+kchl6lI/LLe0G/QoZ8pDJc=
-  - secure: lY3/7ZKCvZcQZIDAUDhOyghTKJU84c0DyK7rhVTQnRQ3vPTqsIBaDrmEw3WXpntrSm9m9Wtbx1iJqqzssQhqgnVxrVM410EaxN05EUpwFs4u6Sod5l4xX6RrlWHeWB4MOMjgopPUIRSO7gDapacsBrCBrg1tHzRz+wegtqdE8olviSddamz7dACDujdEApeZGNPOwyr/rCRpsLxN72IjaLdQlhnwHdWqq3cgVw5ThxagglIn0qyhsDm7wovo6Mne8w9dGqFXTiB6rBRl2RAZRmzPj//ca+6em0SfSIc2/b45M53rT5uBeGI5LoVWkdZ97TOewy94cIvLrATwJXTNHFdZAwn75laPt7UllJH43XDCmIGWOQNg9OtY6iN3JJSJZ/0n7iIYWTPIYywM4lnYw9CoiI85EJfQWXRbYEwMstNp1YDL5+PXAzBvcYt5HRcFnlGbIBbI2OSGUxkU6Wpe5GPdgmE/+498lk+mJRoFIn8gQA78SK7FNckS3namVDakt15j7VJZXBPZXZDAAaB7MBgW+2MNXrkB+wm7ta9k8Ac1W4ijb4c7Kiy7JbgafntqzDcw2neIKAdM+IhwgfoVaXppjfOZ41CuegCNf6DcXdG45IILuoMt+aa68aALVTTdUYVWZ03GpPzzUxn3qZcIFYRoshbjhngbeSUHUBMervM=
-  - secure: UHWtJ1dp117LbHQk6frewNSUMlHoOJ1/nSSKqBFmAUOOETv6l/LP7lNzyTeCf4H+5rSEAPghGhZdQWJAklQVXSi+KPkP09dQeJP0YmBGh0392GxssphP37tnNZsoWLrcP3w8tBEemYEY5wbGypr0j41uZYPJF5QOSvX7XaC2klZs3RmfoZb2SQ7WY7CO1bHZU7s3Kor9StXAXwfJ1MWdimQGQSY+rjfERjd5PB8AkdpOJlqz8eUlFGekEhHEeo6GvNdr7nutr/QI1fDgcUyR2GzInF0kz03HIEvyZGyh3qL96Xya8vt5RrrmH1uhagZOTtcMbLwTRL7x16lGVoAY7AiHHm6ofKcq+ovlHlWhsVLY/n3G/93dvrQwzPHgORrr2Co27KrLNcv9cDsJyMX5h8sa4/cBGKkriv1WuZITp4iFJ/MEc+lmyxKVBdzcsyJXGb+GKi36wvIA+QmPmRjSi9l7RyfjHoswW89Grugvu98m2Ey60pqXi6CpimTr/07D7+2tHcfIWvJ1rhdqeQjRhMhFaPTV0NCYwGxPnYe/qcYKx2qC+BC9KKpRfW8EFT8XD/3IWAIjcjjNNW2u8r3rHz+IZ9SXyMU2gUsNP+gxyUIEIT71s1B5adzx+ftV6yKvAmtOYel9jyxOkUbiJ27x+k3y8Vg5Axx8uHOZnx/zdX8=
-  - secure: Q9UIt7u2pPXPsQY7K2UJILqM82WWb0aBd0sCId3nY9elna5CWasTKiPXn53zLXt5Dm5hY/79xCFszPDvLOHN01OmWzam5jfYzrmZcKADvdhzTCA+SZnH2dT632KjwZO59SXOItaSkqOsr5+ESoyXoSRokJodQVXNY26Q63dQQ3bXI3kPhnuOWZvsLGbqVTifeF+ivBApFX642zbgrhODY2jFv058OF6tP0/2rdGWy4n/w42KMWdBHhGCkZ0/gPi5Rh2l19VNbHYNr9QneeHjx7Z5XNdpXkGY4Nz/PUPuf3uDljBR5Y08OxQTZstss7Zmkcqi1gDUBTZIo14TWJq4qUE9gXoePG2eDNnnwj+xbIhpd5Vjbp19yCoFWDV6J3qPRozUaMSMb4umklhfgp4AVWgo0j3Vu8ELu/OZLkDwzzsdwID1Ibdjxx7PlAdRPdEKPDCrU7PUH7evjxmEQwUtzgSyNkWaIerzl9cv5woTqSCfFnuUUUQ8MhFQrPTzr+P1en14AD/dXxCG/0+XWmMiUsMcuOm26lFcj5QnKMOM4/RuGnHyL3cpUv+huZD82XswVNWIaTUfEa7bjOWmbJ25ZM3HvlCE8OzyKAq566qaKaKGTQeMYbsxEZh0YSluW7o+Axr2w3Yhrl32UcpfAvlf1FH0E4Y3vasckAww4cQ0OMU=
